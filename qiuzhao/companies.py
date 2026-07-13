@@ -118,4 +118,11 @@ COMPANIES = [
     {"name": "宁德时代", "url": "https://www.catl.com/careers/", "type": "html"},
     {"name": "莉莉丝", "url": "https://lilithgames.com/careers/", "type": "html"},
     {"name": "鹰角网络", "url": "https://ak.hypergryph.com/", "type": "html"},
+    {"name": "大疆", "url": "https://we.dji.com/cn/campus", "type": "html"},
+
+    # ===== 制造业/工业 =====
+    {"name": "施耐德电气", "url": "https://www.se.com/cn/zh/about-us/careers/", "type": "html"},
+    {"name": "凯捷中国", "url": "https://www.capgemini.com/cn-zh/careers/", "type": "html"},
+    {"name": "宝钢股份", "url": "https://zhaopin.baosteel.com/", "type": "html"},
+    {"name": "东北证券", "url": "https://www.nesc.cn/recruitment/", "type": "html"},
 ]
