@@ -125,4 +125,8 @@ COMPANIES = [
     {"name": "凯捷中国", "url": "https://www.capgemini.com/cn-zh/careers/", "type": "html"},
     {"name": "宝钢股份", "url": "https://zhaopin.baosteel.com/", "type": "html"},
     {"name": "东北证券", "url": "https://www.nesc.cn/recruitment/", "type": "html"},
+    {"name": "特斯拉", "url": "https://www.tesla.cn/careers", "type": "html"},
+    {"name": "安永", "url": "https://www.ey.com/zh_cn/careers", "type": "html"},
+    {"name": "普华永道", "url": "https://www.pwccn.com/zh/careers.html", "type": "html"},
+    {"name": "毕马威", "url": "https://home.kpmg/cn/zh/home/careers.html", "type": "html"},
 ]
