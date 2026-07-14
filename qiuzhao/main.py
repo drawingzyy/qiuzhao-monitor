@@ -11,7 +11,7 @@ from qiuzhao.scrapers.search import SearchScraper
 from qiuzhao.seed_data import inject_seed_data, SEED_POSITIONS
 from qiuzhao.pipeline.aggregator import aggregate
 from qiuzhao.pipeline.dedup import deduplicate_by_url, deduplicate_by_title
-from qiuzhao.pipeline.formatter import format_daily_report, format_empty_report
+from qiuzhao.pipeline.formatter import format_daily_report, format_empty_report, format_full_report
 from qiuzhao.notifiers.desktop import DesktopNotifier
 from qiuzhao.notifiers.email import EmailNotifier
 from qiuzhao.notifiers.pushplus import PushPlusNotifier
@@ -109,8 +109,9 @@ async def main() -> None:
         logger.info("首次运行，注入种子数据...")
         seed_count, seed_items = inject_seed_data(insert_position)
         logger.info(f"种子数据: {seed_count} 条已知秋招信息已入库")
-        message = format_daily_report(seed_items)
-        title = f"🍂 秋招日报 — 已开放 {seed_count} 个职位"
+        # 用新的分类格式化
+        message = format_full_report(seed_items, is_daily=False)
+        title = f"🍂 2027届秋招合集 — {seed_count} 个职位已开放"
         notifiers = get_notifiers()
         for n in notifiers:
             await n.send(title, message)
