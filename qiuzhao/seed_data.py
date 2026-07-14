@@ -1,113 +1,96 @@
-"""种子数据 — 基于 2026 年 7 月已知的 2027 届秋招开放情况。
+"""种子数据 — 2027 届秋招已开放职位（已过滤纯工科技术岗）。
 
-这些数据来自多渠道搜索结果，作为首次运行的初始数据。
-后续每日扫描会在此基础上检测新增。
+保留：产品、AI、管培、咨询、市场、金融、设计、运营等方向。
+去除：嵌入式、硬件、电气、电池、自动化、电力等硬核工科岗。
 """
 
 from datetime import date
 
-# 已知已开放 2027 届秋招/提前批的公司及其信息
 SEED_POSITIONS = [
-    # ===== 互联网大厂 - 提前批已开 =====
-    {"company": "字节跳动", "title": "2027届秋招提前批 - 研发岗（7.10全面开闸）", "source": "官方招聘"},
-    {"company": "字节跳动", "title": "2027届ByteIntern实习转正（研发类4800+岗位）", "source": "官方招聘"},
-    {"company": "腾讯", "title": "2027届秋招提前批 - TEG技术岗（7.11开启）", "source": "官方招聘"},
-    {"company": "腾讯", "title": "2027届产品经理培训生", "source": "官方招聘"},
-    {"company": "阿里巴巴", "title": "2027届秋招提前批 - 技术岗（6月开启）", "source": "官方招聘"},
-    {"company": "阿里巴巴", "title": "2027届阿里星顶尖人才计划（7.2启动）", "source": "官方招聘"},
-    {"company": "美团", "title": "2027届秋招提前批 - 3000+转正实习岗（7.9开启）", "source": "官方招聘"},
-    {"company": "美团", "title": "2027届北斗计划 - 大模型/自动驾驶", "source": "官方招聘"},
-    {"company": "百度", "title": "2027届秋招提前批 - 技术/产品/设计/AI方向（7.9开启）", "source": "官方招聘"},
-    {"company": "京东", "title": "2027届秋招提前批 - JD YOUNG实习生计划（7.3开启）", "source": "官方招聘"},
-    {"company": "拼多多", "title": "2027届秋招提前批 - 研发实习岗（7月中旬）", "source": "官方招聘"},
-    {"company": "快手", "title": "2027届秋招正式批（7月起）", "source": "官方招聘"},
-    {"company": "华为", "title": "2027届实习生招聘（3.15已启动）", "source": "官方招聘"},
-    {"company": "滴滴", "title": "2027届秋储实习生（7.17启动）", "source": "官方招聘"},
+    # ===== 互联网 - 产品 & AI 方向 =====
+    {"company": "腾讯", "title": "2027届产品经理培训生", "source": "join.qq.com"},
+    {"company": "腾讯", "title": "2027届秋招提前批（7.11开启，含产品/AI方向）", "source": "join.qq.com"},
+    {"company": "字节跳动", "title": "2027届秋招提前批（7.10开闸，含AI/产品方向）", "source": "jobs.bytedance.com"},
+    {"company": "阿里巴巴", "title": "2027届阿里星顶尖人才计划 - AI方向（7.2启动）", "source": "talent.alibaba.com"},
+    {"company": "阿里巴巴", "title": "2027届秋招提前批（6月开启，含AI/产品/运营）", "source": "talent.alibaba.com"},
+    {"company": "百度", "title": "2027届秋招提前批 - AI/产品/设计方向（7.9开启）", "source": "talent.baidu.com"},
+    {"company": "百度", "title": "2027届AIDU顶尖人才计划 - 大模型算法/AI产品", "source": "talent.baidu.com"},
+    {"company": "美团", "title": "2027届秋招提前批 - 含产品/商业分析/AI方向（7.9开启）", "source": "zhaopin.meituan.com"},
+    {"company": "美团", "title": "2027届北斗计划 - 大模型/自动驾驶（AI方向）", "source": "zhaopin.meituan.com"},
+    {"company": "京东", "title": "2027届TET管培生（综合/物流/产品方向）", "source": "campus.jd.com"},
+    {"company": "京东", "title": "2027届TGT天才青年计划 - 大模型/云计算", "source": "campus.jd.com"},
+    {"company": "京东", "title": "2027届秋招提前批（7.3开启，含产品/运营）", "source": "campus.jd.com"},
+    {"company": "快手", "title": "2027届快Star顶尖技术计划 - 大模型/推荐系统（AI方向）", "source": "zhaopin.kuaishou.cn"},
+    {"company": "快手", "title": "2027届秋招正式批（7月起，含产品/运营/设计）", "source": "zhaopin.kuaishou.cn"},
+    {"company": "拼多多", "title": "2027届云弧计划 - 大模型/商业分析", "source": "careers.pinduoduo.com"},
+    {"company": "小红书", "title": "2027届秋招（含产品/运营/市场方向）", "source": "job.xiaohongshu.com"},
+    {"company": "滴滴", "title": "2027届秋储实习生（7.17启动，含产品/运营）", "source": "campus.didiglobal.com"},
+    {"company": "哔哩哔哩", "title": "2027届校招（含产品/运营/设计方向）", "source": "jobs.bilibili.com"},
+
+    # ===== AI 专项 =====
+    {"company": "大疆", "title": "2027届校招提前批 - AI算法/产品方向", "source": "we.dji.com"},
+    {"company": "商汤科技", "title": "2027届校招 - 大模型/AI产品", "source": "sensetime.com"},
+    {"company": "科大讯飞", "title": "2027届校招 - AI产品/运营", "source": "campus.iflytek.com"},
+
+    # ===== 游戏 - 策划/美术/运营 =====
+    {"company": "米哈游", "title": "2027届校招 - 策划/美术/运营", "source": "campus.mihoyo.com"},
+    {"company": "网易游戏", "title": "2027届校招 - 游戏策划/美术/运营", "source": "game.campus.163.com"},
+    {"company": "莉莉丝", "title": "2027届校招 - 游戏策划/运营", "source": "lilithgames.com"},
+
+    # ===== 新能源汽车 - 产品/设计 =====
+    {"company": "蔚来", "title": "2027届校招 - 产品/设计/用户运营", "source": "nio.com"},
+    {"company": "理想汽车", "title": "2027届校招 - AI/产品/设计", "source": "lixiang.com"},
+    {"company": "小鹏汽车", "title": "2027届校招 - AI产品/用户研究", "source": "xiaopeng.com"},
+    {"company": "比亚迪", "title": "2027届校招 - 产品/管理培训生", "source": "job.byd.com"},
+    {"company": "特斯拉", "title": "2027届校招 - 产品/市场方向", "source": "tesla.cn"},
 
     # ===== 外企科技 =====
-    {"company": "微软", "title": "2027届暑期实习 - Software Engineer Intern", "source": "官方招聘"},
-    {"company": "亚马逊", "title": "2027届校招 - AWS软件开发/后端", "source": "官方招聘"},
-    {"company": "Shopee", "title": "2027届校招 - 研发/产品", "source": "官方招聘"},
-
-    # ===== 金融科技 =====
-    {"company": "同花顺", "title": "2027届提前批 - AI/算法/研发/产品/数据", "source": "官方招聘"},
-
-    # ===== 新能源汽车 =====
-    {"company": "蔚来", "title": "2027届校招 - 研发/产品/设计", "source": "官方招聘"},
-    {"company": "理想汽车", "title": "2027届校招 - 智能驾驶/座舱", "source": "官方招聘"},
-    {"company": "小鹏汽车", "title": "2027届校招 - 自动驾驶/智能座舱", "source": "官方招聘"},
-    {"company": "比亚迪", "title": "2027届校招 - 研发/工程/管理", "source": "官方招聘"},
-    {"company": "宁德时代", "title": "2027届校招 - 电池研发/工程", "source": "官方招聘"},
-
-    # ===== 游戏公司 =====
-    {"company": "米哈游", "title": "2027届校招 - 研发/美术/策划", "source": "官方招聘"},
-    {"company": "网易游戏", "title": "2027届校招 - 游戏研发/策划/美术", "source": "官方招聘"},
-
-    # ===== 咨询 =====
-    {"company": "贝恩", "title": "2027届暑期实习", "source": "官方招聘"},
-    {"company": "德勤", "title": "2027届科技咨询实习", "source": "官方招聘"},
-
-    # ===== 互联网大厂 - 管培/专项计划 =====
-    {"company": "京东", "title": "2027届TET管培生（综合/物流/技术/产品方向）", "source": "官方招聘"},
-    {"company": "京东", "title": "2027届TGT天才青年计划 - 多模态大模型/云计算", "source": "官方招聘"},
-    {"company": "百度", "title": "2027届AIDU顶尖人才计划 - 大模型算法/自动驾驶/AI", "source": "官方招聘"},
-    {"company": "快手", "title": "2027届快Star顶尖技术计划 - 大模型/音视频/推荐系统", "source": "官方招聘"},
-    {"company": "拼多多", "title": "2027届云弧计划 - 大模型底层研发/商业分析", "source": "官方招聘"},
-    {"company": "大疆", "title": "2027届校招提前批 - AI算法/嵌入式/机器人", "source": "官方招聘"},
-
-    # ===== 外企科技 =====
-    {"company": "微软", "title": "2027届暑期实习 - Software Engineer Intern", "source": "官方招聘"},
-    {"company": "亚马逊", "title": "2027届校招 - AWS软件开发/后端", "source": "官方招聘"},
-    {"company": "Shopee", "title": "2027届校招 - 研发/产品", "source": "官方招聘"},
+    {"company": "微软", "title": "2027届暑期实习（含产品/市场方向）", "source": "careers.microsoft.com"},
+    {"company": "亚马逊", "title": "2027届校招 - 产品/运营方向", "source": "amazon.jobs"},
+    {"company": "Shopee", "title": "2027届校招 - 产品经理/运营", "source": "careers.shopee.cn"},
+    {"company": "Apple", "title": "2027届校招 - 产品/市场方向", "source": "apple.com"},
 
     # ===== 金融/银行 =====
-    {"company": "同花顺", "title": "2027届提前批 - AI/算法/研发/产品/数据", "source": "官方招聘"},
-    {"company": "招商银行", "title": "2027届校招 - 金融科技/管培生", "source": "官方招聘"},
-    {"company": "工商银行", "title": "2027届校招 - 总行管培/金融科技", "source": "官方招聘"},
-    {"company": "建设银行", "title": "2027届校招 - 总行管培/科技岗", "source": "官方招聘"},
-    {"company": "中国银行", "title": "2027届校招 - 管培生/信科岗", "source": "官方招聘"},
-    {"company": "东北证券", "title": "2027届暑期实习暨提前批 - 金融/研究/投行/IT", "source": "官方招聘"},
-    {"company": "中金公司", "title": "2027届校招 - 投行/研究/科技", "source": "官方招聘"},
-
-    # ===== 新能源汽车 =====
-    {"company": "蔚来", "title": "2027届校招 - 研发/产品/设计", "source": "官方招聘"},
-    {"company": "理想汽车", "title": "2027届校招 - 智能驾驶/座舱", "source": "官方招聘"},
-    {"company": "小鹏汽车", "title": "2027届校招 - 自动驾驶/智能座舱", "source": "官方招聘"},
-    {"company": "比亚迪", "title": "2027届校招 - 研发/工程/管理", "source": "官方招聘"},
-    {"company": "宁德时代", "title": "2027届校招 - 电池研发/工程", "source": "官方招聘"},
-
-    # ===== 游戏公司 =====
-    {"company": "米哈游", "title": "2027届校招 - 研发/美术/策划", "source": "官方招聘"},
-    {"company": "网易游戏", "title": "2027届校招 - 游戏研发/策划/美术", "source": "官方招聘"},
+    {"company": "招商银行", "title": "2027届校招 - 总行管培生/金融科技", "source": "career.cmbchina.com"},
+    {"company": "工商银行", "title": "2027届校招 - 总行管培生", "source": "job.icbc.com.cn"},
+    {"company": "建设银行", "title": "2027届校招 - 总行管培生", "source": "job.ccb.com"},
+    {"company": "中国银行", "title": "2027届校招 - 管培生/信科岗", "source": "campus.chinahr.com"},
+    {"company": "农业银行", "title": "2027届校招 - 总行管培生", "source": "career.abchina.com"},
+    {"company": "交通银行", "title": "2027届校招 - 管培生/金融科技", "source": "job.bankcomm.com"},
+    {"company": "兴业银行", "title": "2027届校招 - 管培生/金融科技", "source": "campus.cib.com.cn"},
+    {"company": "中金公司", "title": "2027届校招 - 投行/研究/财富管理", "source": "cicc.com"},
+    {"company": "华泰证券", "title": "2027届校招 - 投行/研究/金融科技", "source": "htsc.com"},
+    {"company": "东北证券", "title": "2027届暑期实习暨提前批 - 金融/研究/投行", "source": "nesc.cn"},
+    {"company": "同花顺", "title": "2027届提前批 - AI/产品/数据", "source": "job.10jqka.com.cn"},
 
     # ===== 咨询 =====
-    {"company": "麦肯锡", "title": "2027届校招 - 商业分析/咨询顾问", "source": "官方招聘"},
-    {"company": "波士顿咨询", "title": "2027届校招 - 战略咨询", "source": "官方招聘"},
-    {"company": "贝恩", "title": "2027届暑期实习", "source": "官方招聘"},
-    {"company": "德勤", "title": "2027届科技咨询实习", "source": "官方招聘"},
+    {"company": "麦肯锡", "title": "2027届校招 - 商业分析师/咨询顾问", "source": "mckinsey.com.cn"},
+    {"company": "波士顿咨询", "title": "2027届校招 - 战略咨询", "source": "careers.bcg.com"},
+    {"company": "贝恩", "title": "2027届暑期实习 - 咨询顾问", "source": "bain.com"},
+    {"company": "德勤", "title": "2027届校招 - 咨询/审计/税务", "source": "deloitte.com"},
+    {"company": "普华永道", "title": "2027届校招 - 咨询/审计", "source": "pwccn.com"},
+    {"company": "安永", "title": "2027届校招 - 咨询/审计", "source": "ey.com"},
+    {"company": "毕马威", "title": "2027届校招 - 咨询/审计", "source": "kpmg.com"},
 
     # ===== 快消管培 =====
-    {"company": "联合利华", "title": "2027届管培生 - 市场/供应链/财务/研发", "source": "官方招聘"},
-    {"company": "宝洁", "title": "2027届校招 - 品牌/市场/销售/研发管培生", "source": "官方招聘"},
-    {"company": "欧莱雅", "title": "2027届SeedZ管培项目 - 市场/电商/财务/IT等11个方向", "source": "官方招聘"},
-    {"company": "玛氏", "title": "2027届管培生 - 市场/销售/供应链", "source": "官方招聘"},
-    {"company": "可口可乐", "title": "2027届管培生 - 市场/财务/供应链", "source": "官方招聘"},
-    {"company": "百事", "title": "2027届校招 - 市场/销售管培生", "source": "官方招聘"},
+    {"company": "宝洁", "title": "2027届校招 - 品牌管理/市场/销售管培生", "source": "pgcareers.com"},
+    {"company": "联合利华", "title": "2027届管培生 - 市场/客户发展/财务/HR", "source": "careers.unilever.com.cn"},
+    {"company": "欧莱雅", "title": "2027届SeedZ管培项目 - 市场/电商/财务/IT等11个方向", "source": "careers.loreal.com"},
+    {"company": "玛氏", "title": "2027届管培生 - 市场/销售/供应链", "source": "careers.mars.com"},
+    {"company": "可口可乐", "title": "2027届管培生 - 市场/财务/HR", "source": "coca-colacompany.com"},
+    {"company": "百事", "title": "2027届校招 - 市场/销售管培生", "source": "pepsicojobs.com"},
 
-    # ===== 外企咨询/科技管培 =====
-    {"company": "施耐德电气", "title": "2027届校招 - 电气研发/自动化/财务/供应链", "source": "官方招聘"},
-    {"company": "凯捷中国", "title": "2027届校招 - 管理咨询/数字化咨询/IT实施/数据分析", "source": "官方招聘"},
-    {"company": "IBM", "title": "2027届校招 - 咨询/技术/研发", "source": "官方招聘"},
-    {"company": "SAP", "title": "2027届校招 - 技术/产品/咨询", "source": "官方招聘"},
+    # ===== 外企咨询/综合管培 =====
+    {"company": "凯捷中国", "title": "2027届校招 - 管理咨询/数字化咨询/数据分析", "source": "capgemini.com"},
+    {"company": "IBM", "title": "2027届校招 - 咨询顾问/产品经理", "source": "ibm.com"},
+    {"company": "SAP", "title": "2027届校招 - 产品/咨询/客户成功", "source": "sap.cn"},
 
-    # ===== 国企/央企 =====
-    {"company": "国家电网", "title": "2027届校招 - 电力/信通/管理岗", "source": "官方招聘"},
-    {"company": "中国移动", "title": "2027届校招 - 技术/政企/市场管培", "source": "官方招聘"},
-    {"company": "中国电信", "title": "2027届校招 - 技术/产品/市场", "source": "官方招聘"},
-    {"company": "中国联通", "title": "2027届校招 - IT/网络/市场", "source": "官方招聘"},
-
-    # ===== 制造业 =====
-    {"company": "宝钢股份", "title": "2027届校招 - 自动化/AI数字化/大数据（中国宝武）", "source": "官方招聘"},
+    # ===== 国企/央企 - 管培方向 =====
+    {"company": "中国移动", "title": "2027届校招 - 市场管培/产品经理", "source": "job.10086.cn"},
+    {"company": "中国电信", "title": "2027届校招 - 产品/市场/运营", "source": "zhaopin.chinatelecom.com.cn"},
+    {"company": "中国联通", "title": "2027届校招 - 产品/市场/运营", "source": "zglt.iguopin.com"},
+    {"company": "中国银行", "title": "2027届校招 - 管培生（总行/分行）", "source": "campus.chinahr.com"},
+    {"company": "南方电网", "title": "2027届校招 - 管理/经管类岗位", "source": "zhaopin.csg.cn"},
 ]
 
 
@@ -122,7 +105,7 @@ def get_seed_urls() -> dict[str, str]:
 
 
 def get_company_url(company: str) -> str:
-    """获取公司的校招官网链接（备选：手动映射）。"""
+    """获取公司的校招官网链接。"""
     url_map = get_seed_urls()
     return url_map.get(company, "")
 
