@@ -27,8 +27,9 @@ def init_db() -> None:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             company TEXT NOT NULL DEFAULT '',
             title TEXT NOT NULL,
-            url TEXT NOT NULL,
-            url_hash TEXT NOT NULL UNIQUE,
+            url TEXT NOT NULL DEFAULT '',
+            url_hash TEXT NOT NULL,
+            dedup_key TEXT NOT NULL UNIQUE,
             source TEXT NOT NULL DEFAULT '',
             found_at TEXT NOT NULL,
             created_at TEXT NOT NULL
@@ -64,8 +65,12 @@ def insert_position(
     source: str,
     found_at: str | None = None,
 ) -> bool:
-    """插入一条新职位记录。返回 True 表示新增，False 表示已存在。"""
+    """插入一条新职位记录。返回 True 表示新增，False 表示已存在。
+
+    去重键 = sha256(company + "||" + title)，同公司同岗位不会重复入库。
+    """
     url_hash = hashlib.sha256(url.encode()).hexdigest()
+    dedup_key = hashlib.sha256(f"{company}||{title}".encode()).hexdigest()
     if found_at is None:
         found_at = date.today().isoformat()
     created_at = _now_utc()
@@ -73,14 +78,14 @@ def insert_position(
     conn = get_conn()
     try:
         conn.execute(
-            """INSERT INTO positions (company, title, url, url_hash, source, found_at, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (company, title, url, url_hash, source, found_at, created_at),
+            """INSERT INTO positions (company, title, url, url_hash, dedup_key, source, found_at, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (company, title, url, url_hash, dedup_key, source, found_at, created_at),
         )
         conn.commit()
         return True
     except sqlite3.IntegrityError:
-        # url_hash 冲突：已存在
+        # dedup_key 冲突：已存在
         return False
     finally:
         conn.close()
