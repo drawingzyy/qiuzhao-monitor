@@ -108,3 +108,13 @@ def get_all_url_hashes() -> set[str]:
     rows = conn.execute("SELECT url_hash FROM positions").fetchall()
     conn.close()
     return {row["url_hash"] for row in rows}
+
+
+def get_all_positions() -> list[dict]:
+    """获取数据库中所有职位记录。"""
+    conn = get_conn()
+    rows = conn.execute(
+        "SELECT company, title, url, source, found_at FROM positions ORDER BY created_at"
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
