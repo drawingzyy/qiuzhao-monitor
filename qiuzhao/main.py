@@ -5,10 +5,10 @@ from datetime import date
 from loguru import logger
 
 from qiuzhao.config import NOTIFIER_TYPES, DEBUG
-from qiuzhao.db import init_db, insert_position, get_all_url_hashes, get_today_count
+from qiuzhao.db import init_db, insert_position, get_all_url_hashes, get_today_count, get_all_positions
 from qiuzhao.scrapers.nowcoder import NowcoderScraper
 from qiuzhao.scrapers.search import SearchScraper
-from qiuzhao.seed_data import inject_seed_data, SEED_POSITIONS
+from qiuzhao.seed_data import inject_seed_data, SEED_POSITIONS, CATEGORY_NAMES
 from qiuzhao.pipeline.aggregator import aggregate
 from qiuzhao.pipeline.dedup import deduplicate_by_url, deduplicate_by_title
 from qiuzhao.pipeline.formatter import format_daily_report, format_empty_report, format_full_report
@@ -74,6 +74,23 @@ async def _run_one_scraper(name: str, scraper) -> tuple[str, list[dict], str | N
         return name, [], str(e)
     finally:
         await scraper.close()
+
+
+def _enrich(item: dict) -> dict:
+    """给数据条目补上 category 和 verified 字段。"""
+    company = item.get("company", "")
+    # 从种子数据中查找匹配
+    for cat, c, title, verified in SEED_POSITIONS:
+        if c == company:
+            item["category"] = cat
+            item["verified"] = verified
+            break
+    if "category" not in item:
+        # 从 source 字段推断 category（source 存的是分类名）
+        item["category"] = "other"
+    if "verified" not in item:
+        item["verified"] = False
+    return item
 
 
 def get_notifiers() -> list:
@@ -145,22 +162,23 @@ async def main() -> None:
             saved_count += 1
     logger.info(f"新写入数据库 {saved_count} 条")
 
-    # 6. 格式化推送消息
-    empty_sources = [
-        name for name, items in scraped.items() if len(items) == 0
-    ]
-
+    # 6. 格式化推送消息 — 新增在前，全部累计在后
     if new_items:
-        footer = ""
-        if failed_sources:
-            footer = f"\n⚠️ 抓取失败: {', '.join(failed_sources)}"
-        elif empty_sources:
-            footer = f"\n💤 无新结果: {', '.join(empty_sources)}"
-        message = format_daily_report(new_items, footer)
-        title = f"秋招新增 {len(new_items)} 个职位 ({date.today().strftime('%m/%d')})"
+        for item in new_items:
+            item["is_new"] = True
+            _enrich(item)
+        all_positions = [_enrich(dict(p)) for p in get_all_positions()]
+        for item in all_positions:
+            item["is_new"] = False
+        all_positions = new_items + all_positions
+        message = format_full_report(all_positions, is_daily=True)
+        title = f"🍂 秋招新增 {len(new_items)} 个 ({date.today().strftime('%m/%d')})"
     else:
-        message = format_empty_report(failed_sources if failed_sources else None)
-        title = f"秋招扫描日报 ({date.today().strftime('%m/%d')})"
+        all_positions = [_enrich(dict(p)) for p in get_all_positions()]
+        for item in all_positions:
+            item["is_new"] = False
+        message = format_full_report(all_positions, is_daily=True)
+        title = f"🍂 秋招日报 ({date.today().strftime('%m/%d')})"
 
     # 7. 推送到所有渠道
     notifiers = get_notifiers()
