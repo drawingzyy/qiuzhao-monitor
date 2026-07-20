@@ -20,7 +20,7 @@ def get_conn() -> sqlite3.Connection:
 
 
 def init_db() -> None:
-    """初始化数据库表结构。"""
+    """初始化数据库表结构（含迁移兼容）。"""
     conn = get_conn()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS positions (
@@ -35,6 +35,17 @@ def init_db() -> None:
             created_at TEXT NOT NULL
         )
     """)
+    # 兼容旧表：如果没有 dedup_key 列则添加
+    cols = conn.execute("PRAGMA table_info(positions)").fetchall()
+    col_names = {c["name"] for c in cols}
+    if "dedup_key" not in col_names:
+        conn.execute("ALTER TABLE positions ADD COLUMN dedup_key TEXT NOT NULL DEFAULT ''")
+        # 为已有数据生成 dedup_key
+        rows = conn.execute("SELECT id, company, title FROM positions WHERE dedup_key = ''").fetchall()
+        for row in rows:
+            dk = hashlib.sha256(f"{row['company']}||{row['title']}".encode()).hexdigest()
+            conn.execute("UPDATE positions SET dedup_key = ? WHERE id = ?", (dk, row["id"]))
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_dedup_key ON positions(dedup_key)")
     conn.execute("""
         CREATE INDEX IF NOT EXISTS idx_positions_company
         ON positions(company)
